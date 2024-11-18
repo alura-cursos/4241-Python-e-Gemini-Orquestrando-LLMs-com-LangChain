@@ -5,7 +5,8 @@ from my_models import GEMINI_FLASH, MARITACA_SABIA
 from my_keys import GEMINI_API_KEY, MARITACA_API_KEY
 from my_helper import encode_image
 from langchain.prompts import ChatPromptTemplate, PromptTemplate
-from langchain_core.output_parsers import StrOutputParser
+from langchain_core.output_parsers import StrOutputParser, JsonOutputParser
+from detalhes_imagem_modelo import DetalhesImagemModelo
 from langchain.globals import set_debug
 set_debug(True)
 
@@ -48,6 +49,10 @@ template_analisador = ChatPromptTemplate.from_messages(
 
 cadeia_analise_imagem = template_analisador | llm | StrOutputParser()
 
+parser_json_imagem = JsonOutputParser(
+  pydantic_object=DetalhesImagemModelo
+)
+
 template_resposta = PromptTemplate(
   template="""
   Gere um resumo, utilizando uma linguagem clara e objetiva, focada
@@ -57,16 +62,19 @@ template_resposta = PromptTemplate(
 
   # O Resultado da imagem
   {resposta_cadeia_analise_imagem}
+
+  # FORMATO DE SAÍDA
+  {formato_saida}
   """,
-  input_variables=["resposta_cadeia_analise_imagem"]
+  input_variables=["resposta_cadeia_analise_imagem"],
+  partial_variables={
+    "formato_saida" : parser_json_imagem.get_format_instructions()
+  }
 )
 
-llm_maritaca = ChatMaritalk(
-  api_key=MARITACA_API_KEY,
-  model=MARITACA_SABIA
-)
 
-cadeia_resumo = template_resposta | llm_maritaca | StrOutputParser()
+
+cadeia_resumo = template_resposta | llm | StrOutputParser()
 
 cadeia_completa = (cadeia_analise_imagem | cadeia_resumo)
 
