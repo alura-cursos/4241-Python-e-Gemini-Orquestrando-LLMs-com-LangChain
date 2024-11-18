@@ -8,7 +8,7 @@ from langchain.prompts import ChatPromptTemplate, PromptTemplate
 from langchain_core.output_parsers import StrOutputParser, JsonOutputParser
 from detalhes_imagem_modelo import DetalhesImagemModelo
 from langchain.globals import set_debug
-set_debug(True)
+set_debug(False)
 
 llm = ChatGoogleGenerativeAI(
   api_key=GEMINI_API_KEY,
@@ -71,8 +71,6 @@ template_resposta = PromptTemplate(
     "formato_saida" : parser_json_imagem.get_format_instructions()
   }
 )
-
-
 
 cadeia_resumo = template_resposta | llm | parser_json_imagem
 
