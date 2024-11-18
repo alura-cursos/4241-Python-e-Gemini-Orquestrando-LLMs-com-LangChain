@@ -14,7 +14,7 @@ from detalhes_imagem_model import DetalhesImagemModelo
 
 imagem = encode_image("Aula 3/v3/dados/exemplo_grafico.jpg")
 
-llm_gemini = ChatGoogleGenerativeAI(api_key=GEMINI_API_KEY, model=GEMINI_FLASH)
+llm_gemini = ChatGoogleGenerativeAI(api_key=GEMINI_API_KEY, model=GEMINI_PRO)
 
 template_analise_imagens = ChatPromptTemplate.from_messages(
     [

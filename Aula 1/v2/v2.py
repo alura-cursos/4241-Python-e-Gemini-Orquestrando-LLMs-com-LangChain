@@ -20,6 +20,4 @@ mensagem = HumanMessage(
 
 resposta = llm.invoke([mensagem])
 
-
-
 print(resposta.content)
