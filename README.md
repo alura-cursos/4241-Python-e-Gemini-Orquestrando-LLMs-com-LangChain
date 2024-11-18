@@ -18,8 +18,10 @@ As técnicas e tecnologias utilizadas pra isso são:
 
 - Programação em Python
 - Uso da API Gemini
-- 
-- 
+- Uso do Framework LangChain
+- Cadeias Simples
+- Agente Orquestrador
+- Agente como Ferramentas
 
 
 ## 🛠️ Abrir e rodar o projeto
