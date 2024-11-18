@@ -5,6 +5,7 @@ from my_models import GEMINI_FLASH, MARITACA_SABIA
 from my_keys import GEMINI_API_KEY, MARITACA_API_KEY
 from my_helper import encode_image
 from langchain.prompts import ChatPromptTemplate
+from langchain_core.output_parsers import StrOutputParser
 
 llm = ChatGoogleGenerativeAI(
   api_key=GEMINI_API_KEY,
@@ -21,6 +22,10 @@ template_analisador = ChatPromptTemplate.from_messages(
       Assuma que você é um analisador de imagens. A sua tarefa principal
       consiste em: analisar uma imagem e extrair informações importantes
       de forma objetiva.
+
+      # FORMATO DE SAÍDA
+      Descrição da Imagem: 'Coloque a sua descrição da imagem aqui'
+      Rótulos: 'Coloque uma lista com três termos chave separados por vírgula'
       """
     ),
     (
@@ -32,13 +37,14 @@ template_analisador = ChatPromptTemplate.from_messages(
         },
         {
           "type" : "image_url",
-          "image_url" : "data:image/jpeg;base64,{imagem}"
+          "image_url" : {"url":"data:image/jpeg;base64,{imagem_informada}"}
         }
       ]
     )
   ]
 )
 
-resposta = llm.invoke([mensagem])
+cadeia = template_analisador | llm | StrOutputParser()
+resposta = cadeia.invoke({"imagem_informada": imagem})
 
 print(resposta)
