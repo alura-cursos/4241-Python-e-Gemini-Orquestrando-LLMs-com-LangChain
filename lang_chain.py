@@ -4,8 +4,10 @@ from langchain_core.messages import HumanMessage
 from my_models import GEMINI_FLASH, MARITACA_SABIA
 from my_keys import GEMINI_API_KEY, MARITACA_API_KEY
 from my_helper import encode_image
-from langchain.prompts import ChatPromptTemplate
+from langchain.prompts import ChatPromptTemplate, PromptTemplate
 from langchain_core.output_parsers import StrOutputParser
+from langchain.globals import set_debug
+set_debug(True)
 
 llm = ChatGoogleGenerativeAI(
   api_key=GEMINI_API_KEY,
@@ -44,7 +46,30 @@ template_analisador = ChatPromptTemplate.from_messages(
   ]
 )
 
-cadeia = template_analisador | llm | StrOutputParser()
-resposta = cadeia.invoke({"imagem_informada": imagem})
+cadeia_analise_imagem = template_analisador | llm | StrOutputParser()
+
+template_resposta = PromptTemplate(
+  template="""
+  Gere um resumo, utilizando uma linguagem clara e objetiva, focada
+  no público brasileiro. A ideia é que a comunicação do resultado
+  seja o mais fácil possível, priorizando registros para consultas
+  posteriores.
+
+  # O Resultado da imagem
+  {resposta_cadeia_analise_imagem}
+  """,
+  input_variables=["resposta_cadeia_analise_imagem"]
+)
+
+llm_maritaca = ChatMaritalk(
+  api_key=MARITACA_API_KEY,
+  model=MARITACA_SABIA
+)
+
+cadeia_resumo = template_resposta | llm_maritaca | StrOutputParser()
+
+cadeia_completa = (cadeia_analise_imagem | cadeia_resumo)
+
+resposta = cadeia_completa.invoke({"imagem_informada": imagem})
 
 print(resposta)
